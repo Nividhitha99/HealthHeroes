@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation / Logout Button -->
+    <header>
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt" title="Logout"></i>
+        </button>
+    </header>
+
+    <main role="main" class="container">
+        @RenderBody()
+    </main>
+
+    <!-- Optional Footer: If you want to keep a footer, otherwise it's removed -->
+    <!-- <footer class="text-muted text-center">
+        &copy; 2024 Health Heroes
+    </footer> -->
+    @RenderSection("Scripts", required: false)
+
+    <!-- Ensure jQuery is loaded -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Logout Script -->
+    <script>
+        function logout() {
+            fetch('/Account/Logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = '/Account/Login';
+                } else {
+                    alert('Logout failed. Please try again.');
+                }
+            }).catch(error => {
+                console.error('Logout error:', error);
+                alert('An error occurred during logout.');
+            });
+        }
+    </script>
+    <script>
+        let idleTime = 0;
+
+        // Increment the idle time counter every second
+        const idleInterval = setInterval(timerIncrement, 1000);
+
+        // Reset idle timer on mouse or keyboard events
+        window.onload = resetTimer;
+        window.onmousemove = resetTimer;
+        window.onkeypress = resetTimer;
+
+        function timerIncrement() {
+            idleTime += 1;
+            if (idleTime >= 120) { // 10 seconds of inactivity
+                alert('Session expired. Redirecting to login page.');
+                window.location.href = '/Account/Login?message=Session%20expired';
+            }
+        }
+
+        function resetTimer() {
+            idleTime = 0;
+        }
+    </script>
+
+
+    <!-- Inline CSS for Layout and Logout Button -->
+    <style>
+        /* Style for the black logout button */
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: black; /* Black color for the logout button */
+            z-index: 1000; /* Ensure the button is on top */
+        }
+
+            .logout-btn i {
+                font-size: 30px; /* Icon size */
+            }
+
+            .logout-btn:hover i {
+                color: #333; /* Darker hover effect */
+            }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffe6e6; /* Light background for the layout */
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+    </style>
+</body>
+</html>

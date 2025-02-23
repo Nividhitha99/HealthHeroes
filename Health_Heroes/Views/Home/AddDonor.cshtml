@@ -1,0 +1,354 @@
+﻿@model Health_Heroes.Models.Donor_Details
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewData["Title"] = "Add Donor";
+
+    // Fetch the logged-in email from the session
+    var email = HttpContextAccessor.HttpContext.Session.GetString("UserEmail");
+}
+
+<!-- Logout Button in the Top-Right Corner -->
+<button class="logout-btn" onclick="logout()">
+    <i class="fas fa-sign-out-alt" title="Logout"></i>
+</button>
+
+<div class="container">
+    <h1 class="page-title">Add Donor</h1>
+    <h4 class="subtitle">Take the first step in saving lives</h4>
+
+    <!-- Donor Form -->
+    <div class="form-container">
+        <!-- Pre-filled Fields (SSN, Name, and Email are read-only) -->
+        <div class="form-group">
+            <label for="SSN">SSN</label>
+            <input type="text" id="SSN" name="SSN" class="form-control" value="@Model.SSN" readonly required />
+        </div>
+
+        <div class="form-group">
+            <label for="Name">Name</label>
+            <input type="text" id="Name" name="Name" class="form-control" value="@Model.Name" readonly required />
+        </div>
+
+        <div class="form-group">
+            <label for="Email_Address">Email</label>
+            <input type="email" id="Email_Address" name="Email_Address" class="form-control" value="@email" readonly required />
+        </div>
+
+        <!-- Other Fields for Donor Information -->
+        <!-- Age Field with Validation -->
+        <div class="form-group">
+            <label for="Age">Age (>18 years)*</label>
+            <input type="number" id="Age" name="Age" class="form-control" required />
+            <small id="ageError" class="error-message" style="color: red; display: none;">Age must be greater than 18.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="Blood_Type">Blood Type (A+, B-, etc..) *</label>
+            <input type="text" id="Blood_Type" name="Blood_Type" class="form-control" required />
+            <small id="bloodTypeError" class="error-message" style="color: red; display: none;">Please mention if it's + or - such as A+</small>
+        </div>
+
+        <div class="form-group">
+            <label for="PhoneNumber">Phone Number (xxx-xxx-xxxx) *</label>
+            <input type="text" id="PhoneNumber" name="PhoneNumber" class="form-control" required />
+            <small id="phoneError" class="error-message" style="color: red; display: none;">Phone number should be in the format xxx-xxx-xxxx</small>
+        </div>
+
+        <div class="form-group">
+            <label for="City">City *</label>
+            <select id="City" name="City" class="form-control" required>
+                <option value="">Select a city</option>
+                <option value="Aberdeen">Aberdeen</option>
+                <option value="Annapolis">Annapolis</option>
+                <option value="Baltimore">Baltimore</option>
+                <option value="Bel Air">Bel Air</option>
+                <option value="Bowie">Bowie</option>
+                <option value="Cambridge">Cambridge</option>
+                <option value="College Park">College Park</option>
+                <option value="Cumberland">Cumberland</option>
+                <option value="Easton">Easton</option>
+                <option value="Ellicott City">Ellicott City</option>
+                <option value="Frederick">Frederick</option>
+                <option value="Gaithersburg">Gaithersburg</option>
+                <option value="Greenbelt">Greenbelt</option>
+                <option value="Hagerstown">Hagerstown</option>
+                <option value="Laurel">Laurel</option>
+                <option value="Rockville">Rockville</option>
+                <option value="Salisbury">Salisbury</option>
+                <option value="Silver Spring">Silver Spring</option>
+                <option value="Towson">Towson</option>
+                <option value="Westminster">Westminster</option>
+                <option value="Bethesda">Bethesda</option>
+                <option value="Chevy Chase">Chevy Chase</option>
+                <option value="Columbia">Columbia</option>
+                <option value="Germantown">Germantown</option>
+                <option value="Hyattsville">Hyattsville</option>
+                <option value="Landover">Landover</option>
+                <option value="Lanham">Lanham</option>
+                <option value="Oxon Hill">Oxon Hill</option>
+                <option value="Potomac">Potomac</option>
+                <option value="Severna Park">Severna Park</option>
+                <option value="Waldorf">Waldorf</option>
+                <option value="Upper Marlboro">Upper Marlboro</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Illness">Illness (Optional)</label>
+            <input type="text"
+                   id="Illness"
+                   name="Illness"
+                   class="form-control"
+                   value="@Model.Illness"
+                   oninput="sanitizeInput(this)"
+                   maxlength="255" />
+            <small id="illnessError" class="error-message" style="color: red; display: none;">
+                Invalid characters detected in the illness field.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="Height">Height (in ft) *</label>
+            <input type="number" id="Height" name="Height" class="form-control" step="0.01" required />
+        </div>
+
+        <div class="form-group">
+            <label for="Weight">Weight (in oz) *</label>
+            <input type="number" id="Weight" name="Weight" class="form-control" step="0.01" required />
+        </div>
+
+        <div class="form-group">
+            <label for="Gender">Gender *</label>
+            <select id="Gender" name="Gender" class="form-control" required>
+                <option value="M">M</option>
+                <option value="F">F</option>
+            </select>
+        </div>
+
+        <!-- Add Donor Button -->
+        <button type="button" id="addDonorBtn" class="btn btn-primary" disabled>Add Donor</button>
+    </div>
+</div>
+
+<!-- Ensure jQuery is loaded -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function sanitizeInput(inputField) {
+        const invalidCharPattern = /[<>]/g; // Detects characters '<' or '>'
+        const errorField='illnessError';
+        const errorElement = document.getElementById(errorField);
+
+        if (invalidCharPattern.test(inputField.value)) {
+            errorElement.style.display = 'block';
+            inputField.value = inputField.value.replace(invalidCharPattern, '');
+        } else {
+            errorElement.style.display = 'none';
+        }
+    }
+</script>
+<script>
+    function validateForm() {
+        let isValid = true;
+
+        // Age validation
+        const ageInput = document.getElementById('Age');
+        const ageError = document.getElementById('ageError');
+        if (ageInput.value < 18) {
+            ageError.style.display = 'block';
+            isValid = false;
+        } else {
+            ageError.style.display = 'none';
+        }
+
+        // Phone Number validation
+        const phoneInput = document.getElementById('PhoneNumber');
+        const phonePattern = /^\d{3}-\d{3}-\d{4}$/;
+        const phoneError = document.getElementById('phoneError');
+        if (!phonePattern.test(phoneInput.value)) {
+            phoneError.style.display = 'block';
+            isValid = false;
+        } else {
+            phoneError.style.display = 'none';
+        }
+
+        // Blood Type validation
+        const bloodTypeInput = document.getElementById('Blood_Type');
+        const bloodTypeError = document.getElementById('bloodTypeError');
+        if (!/[\+\-]$/.test(bloodTypeInput.value)) {
+            bloodTypeError.style.display = 'block';
+            isValid = false;
+        } else {
+            bloodTypeError.style.display = 'none';
+        }
+
+        // Enable or disable the button based on the validation
+        const addDonorBtn = document.getElementById('addDonorBtn');
+        addDonorBtn.disabled = !isValid;
+    }
+
+    document.querySelectorAll('input, select').forEach((input) => {
+        input.addEventListener('input', validateForm);
+    });
+
+    function submitDonorForm() {
+        const donorData = {
+            SSN: document.getElementById('SSN').value,
+            Name: document.getElementById('Name').value,
+            Age: document.getElementById('Age').value,
+            Email_Address: document.getElementById('Email_Address').value,
+            Blood_Type: document.getElementById('Blood_Type').value,
+            PhoneNumber: document.getElementById('PhoneNumber').value,
+            City: document.getElementById('City').value,
+            Illness: document.getElementById('Illness').value,
+            Height: document.getElementById('Height').value,
+            Weight: document.getElementById('Weight').value,
+            Gender: document.getElementById('Gender').value
+        };
+
+        if (!document.getElementById('addDonorBtn').disabled) {
+            $.ajax({
+                type: 'POST',
+                url: '/Home/AddDonor',
+                contentType: 'application/json',
+                data: JSON.stringify(donorData),
+                success: function (response) {
+                    if (response.success) {
+                        alert('Donor successfully added!');
+                        window.location.href = '/Home/Index'; // Redirect after successful submission
+                    } else {
+                        alert('Failed to add donor: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('An error occurred: ' + error);
+                }
+            });
+        }
+    }
+
+    document.getElementById('addDonorBtn').addEventListener('click', submitDonorForm);
+
+    // Logout function
+    function logout() {
+        fetch('/Account/Logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/Account/Login';
+            } else {
+                alert('Logout failed. Please try again.');
+            }
+        }).catch(error => {
+            console.error('Logout error:', error);
+            alert('An error occurred during logout.');
+        });
+    }
+    window.logout = logout;
+</script>
+
+<style>
+    body {
+        background-color: #ff4d4d;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title, .subtitle {
+        text-align: center;
+        color: #ff4d4d;
+    }
+
+    .page-title {
+        font-size: 36px;
+    }
+
+    .subtitle {
+        font-size: 18px;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+        input[readonly] {
+            background-color: #f2f2f2;
+        }
+
+    .btn {
+        width: 100%;
+        padding: 10px;
+        background-color: #ff4d4d;
+        color: white;
+        font-size: 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        .btn:hover {
+            background-color: #e60000;
+        }
+
+    .error-message {
+        font-size: 14px;
+        color: red;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+    }
+
+    /* Style for the logout button */
+    .logout-btn {
+        position: fixed;
+        top: 20px;
+        right: 30px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        color: black; /* Black logout button */
+        z-index: 1000; /* Ensure button stays above all other elements */
+    }
+
+        .logout-btn i {
+            font-size: 30px; /* Bigger icon */
+        }
+
+        .logout-btn:hover i {
+            color: #333; /* Hover color change */
+        }
+</style>

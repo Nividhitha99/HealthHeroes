@@ -1,0 +1,163 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #ffe6e6; /* Light red background */
+        color: #333; /* Dark text color */
+        position: relative;
+    }
+
+    .slanted-text {
+        font-style: italic; /* Makes the text slanted */
+        color: #ff4d4d; /* Keeps the red color */
+        font-size: 18px; /* Keeps the original size */
+        margin-bottom: 30px; /* Keeps the margin */
+    }
+
+    .login-container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #fff;
+        border: 2px solid #ff4d4d; /* Red border */
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow */
+        position: relative;
+    }
+
+        .login-container h1 {
+            color: #ff4d4d; /* Red color for heading */
+            font-size: 36px;
+        }
+
+        .login-container h3 {
+            color: #ff4d4d; /* Red color for subheading */
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+    .login-form {
+        margin-top: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        position: relative; /* To position the eye icon inside the field */
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9; /* Light background for inputs */
+        color: #333; /* Dark text color */
+    }
+
+    .toggle-password {
+        position: absolute;
+        top: 38px;
+        right: 10px;
+        cursor: pointer;
+        color: #aaa; /* Gray color for the eye icon */
+        font-size: 18px;
+    }
+
+        .toggle-password:hover {
+            color: #ff4d4d; /* Red color on hover */
+        }
+
+    .btn {
+        width: 100%;
+        padding: 10px;
+        background-color: #ff4d4d; /* Red button */
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+        .btn:hover {
+            background-color: #e60000; /* Darker red on hover */
+        }
+
+    .error-message {
+        color: red;
+        margin-top: 10px;
+    }
+
+    p {
+        margin-top: 15px;
+        color: #333;
+    }
+
+        p a {
+            color: #ff4d4d; /* Red link color */
+            text-decoration: none;
+        }
+
+            p a:hover {
+                text-decoration: underline;
+            }
+
+</style>
+
+<!-- Add a Container for the Login Page -->
+<div class="login-container">
+    <h1>Welcome to Health Hero</h1>
+    <h3 class="slanted-text">Your Contribution Matters</h3>
+
+    <!-- Login Form -->
+    <div class="login-form">
+        <form asp-controller="Account" asp-action="Login" method="post">
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="text" name="email" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" name="password" class="form-control" required />
+                <span class="toggle-password" onclick="togglePassword()">👁️</span>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-warning">@ViewBag.Message</div>
+        }
+
+        @if (ViewBag.Error != null)
+        {
+            <p class="error-message">@ViewBag.Error</p>
+        }
+
+        <!-- Link to Sign Up page -->
+        <p>Don't have an account? <a href="/Account/SignUp">Sign Up</a></p>
+    </div>
+</div>
+
+<script>
+    // Function to toggle password visibility
+    function togglePassword() {
+        const passwordField = document.getElementById("password");
+        const toggleIcon = document.querySelector(".toggle-password");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            toggleIcon.textContent = "🙈"; // Change to "hide" icon
+        } else {
+            passwordField.type = "password";
+            toggleIcon.textContent = "👁️"; // Change back to "show" icon
+        }
+    }
+</script>

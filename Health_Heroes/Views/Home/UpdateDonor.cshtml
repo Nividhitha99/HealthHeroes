@@ -1,0 +1,352 @@
+﻿@model Health_Heroes.Models.Donor_Details
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewData["Title"] = "Update Donor";
+
+    // Fetch the logged-in email from the session
+    var email = HttpContextAccessor.HttpContext.Session.GetString("UserEmail");
+}
+
+<!-- Logout Button in the Top-Right Corner -->
+<button class="logout-btn" onclick="logout()">
+    <i class="fas fa-sign-out-alt" title="Logout"></i>
+</button>
+
+<div class="container">
+    <h1 class="page-title">Update Donor Information</h1>
+    <h4 class="subtitle">Update your details</h4>
+
+    <!-- Donor Update Form -->
+    <div class="form-container">
+        <!-- Pre-filled Fields (SSN is editable but Email is read-only) -->
+        <div class="form-group">
+            <label for="SSN">SSN *</label>
+            <input type="text" id="SSN" name="SSN" class="form-control" value="@Model.SSN" required />
+        </div>
+
+        <div class="form-group">
+            <label for="Email_Address">Email *</label>
+            <input type="email" id="Email_Address" name="Email_Address" class="form-control" value="@email" readonly required />
+        </div>
+
+        <!-- Editable fields for Donor Information -->
+        <div class="form-group">
+            <label for="Name">Name *</label>
+            <input type="text"
+                   id="Name"
+                   name="Name"
+                   class="form-control"
+                   value="@Model.Name"
+                   required
+                   oninput="sanitizeInput(this)"
+                   maxlength="50" />
+            <small id="nameError" class="error-message" style="color: red; display: none;">
+                Invalid characters detected in the name field.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="Age">Age (>18 years) *</label>
+            <input type="number" id="Age" name="Age" class="form-control" value="@Model.Age" required />
+            <small id="ageError" class="error-message" style="color: red; display: none;">Age must be greater than 18.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="Blood_Type">Blood Type (A+, B-, etc..) *</label>
+            <input type="text" id="Blood_Type" name="Blood_Type" class="form-control" value="@Model.Blood_Type" required />
+            <small id="bloodTypeError" class="error-message" style="color: red; display: none;">Please mention if it's + or - such as A+</small>
+        </div>
+
+        <div class="form-group">
+            <label for="PhoneNumber">Phone Number (xxx-xxx-xxxx) *</label>
+            <input type="text" id="PhoneNumber" name="PhoneNumber" class="form-control" value="@Model.PhoneNumber" required />
+            <small id="phoneError" class="error-message" style="color: red; display: none;">Phone number should be in the format xxx-xxx-xxxx</small>
+        </div>
+
+        <div class="form-group">
+            <label for="City">City *</label>
+            <select id="City" name="City" class="form-control" required>
+                <option value="">Select a city</option>
+                <option value="Aberdeen" @(Model.City == "Aberdeen" ? "selected" : "")>Aberdeen</option>
+                <option value="Annapolis" @(Model.City == "Annapolis" ? "selected" : "")>Annapolis</option>
+                <option value="Baltimore" @(Model.City == "Baltimore" ? "selected" : "")>Baltimore</option>
+                <option value="Bethesda" @(Model.City == "Bethesda" ? "selected" : "")>Bethesda</option>
+                <option value="Bowie" @(Model.City == "Bowie" ? "selected" : "")>Bowie</option>
+                <option value="College Park" @(Model.City == "College Park" ? "selected" : "")>College Park</option>
+                <option value="Cumberland" @(Model.City == "Cumberland" ? "selected" : "")>Cumberland</option>
+                <option value="Ellicott City" @(Model.City == "Ellicott City" ? "selected" : "")>Ellicott City</option>
+                <option value="Frederick" @(Model.City == "Frederick" ? "selected" : "")>Frederick</option>
+                <option value="Gaithersburg" @(Model.City == "Gaithersburg" ? "selected" : "")>Gaithersburg</option>
+                <option value="Germantown" @(Model.City == "Germantown" ? "selected" : "")>Germantown</option>
+                <option value="Hagerstown" @(Model.City == "Hagerstown" ? "selected" : "")>Hagerstown</option>
+                <option value="Laurel" @(Model.City == "Laurel" ? "selected" : "")>Laurel</option>
+                <option value="Rockville" @(Model.City == "Rockville" ? "selected" : "")>Rockville</option>
+                <option value="Salisbury" @(Model.City == "Salisbury" ? "selected" : "")>Salisbury</option>
+                <option value="Silver Spring" @(Model.City == "Silver Spring" ? "selected" : "")>Silver Spring</option>
+                <option value="Towson" @(Model.City == "Towson" ? "selected" : "")>Towson</option>
+                <option value="Waldorf" @(Model.City == "Waldorf" ? "selected" : "")>Waldorf</option>
+                <!-- Add more Maryland cities as needed -->
+            </select>
+        </div>
+
+
+        <div class="form-group">
+            <label for="Illness">Illness (Optional)</label>
+            <input type="text"
+                   id="Illness"
+                   name="Illness"
+                   class="form-control"
+                   value="@Model.Illness"
+                   oninput="sanitizeInput(this)"
+                   maxlength="255" />
+            <small id="illnessError" class="error-message" style="color: red; display: none;">
+                Invalid characters detected in the illness field.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="Height">Height (in ft) *</label>
+            <input type="number" id="Height" name="Height" class="form-control" value="@Model.Height" step="0.01" required />
+        </div>
+
+        <div class="form-group">
+            <label for="Weight">Weight (in oz) *</label>
+            <input type="number" id="Weight" name="Weight" class="form-control" value="@Model.Weight" step="0.01" required />
+        </div>
+
+        <div class="form-group">
+            <label for="Gender">Gender *</label>
+            <select id="Gender" name="Gender" class="form-control" required>
+                <option value="M" @(Model.Gender == 'M' ? "selected" : "")>M</option>
+                <option value="F" @(Model.Gender == 'F' ? "selected" : "")>F</option>
+            </select>
+        </div>
+
+        <!-- Update Donor Button -->
+        <button type="button" id="updateDonorBtn" class="btn btn-primary" disabled>Update Donor</button>
+    </div>
+</div>
+
+<!-- Ensure jQuery is loaded -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function sanitizeInput(inputField) {
+        const invalidCharPattern = /[<>]/g; // Detects characters '<' or '>'
+        const errorField = inputField.id === 'Name' ? 'nameError' : 'illnessError';
+        const errorElement = document.getElementById(errorField);
+
+        if (invalidCharPattern.test(inputField.value)) {
+            errorElement.style.display = 'block';
+            inputField.value = inputField.value.replace(invalidCharPattern, '');
+        } else {
+            errorElement.style.display = 'none';
+        }
+    }
+</script>
+<script>
+    function validateForm() {
+        let isValid = true;
+
+        // Age validation
+        const ageInput = document.getElementById('Age');
+        const ageError = document.getElementById('ageError');
+        if (ageInput.value < 18) {
+            ageError.style.display = 'block';
+            isValid = false;
+        } else {
+            ageError.style.display = 'none';
+        }
+
+        // Phone Number validation
+        const phoneInput = document.getElementById('PhoneNumber');
+        const phonePattern = /^\d{3}-\d{3}-\d{4}$/;
+        const phoneError = document.getElementById('phoneError');
+        if (!phonePattern.test(phoneInput.value)) {
+            phoneError.style.display = 'block';
+            isValid = false;
+        } else {
+            phoneError.style.display = 'none';
+        }
+
+        // Blood Type validation
+        const bloodTypeInput = document.getElementById('Blood_Type');
+        const bloodTypeError = document.getElementById('bloodTypeError');
+        if (!/[\+\-]$/.test(bloodTypeInput.value)) {
+            bloodTypeError.style.display = 'block';
+            isValid = false;
+        } else {
+            bloodTypeError.style.display = 'none';
+        }
+
+        // Enable or disable the button based on the validation
+        const updateDonorBtn = document.getElementById('updateDonorBtn');
+        updateDonorBtn.disabled = !isValid;
+    }
+
+    document.querySelectorAll('input, select').forEach((input) => {
+        input.addEventListener('input', validateForm);
+    });
+
+    function submitUpdateForm() {
+        const donorData = {
+            SSN: document.getElementById('SSN').value,
+            Name: document.getElementById('Name').value,
+            Age: document.getElementById('Age').value,
+            Email_Address: document.getElementById('Email_Address').value,
+            Blood_Type: document.getElementById('Blood_Type').value,
+            PhoneNumber: document.getElementById('PhoneNumber').value,
+            City: document.getElementById('City').value,
+            Illness: document.getElementById('Illness').value,
+            Height: document.getElementById('Height').value,
+            Weight: document.getElementById('Weight').value,
+            Gender: document.getElementById('Gender').value
+        };
+
+        if (!document.getElementById('updateDonorBtn').disabled) {
+            $.ajax({
+                type: 'POST',
+                url: '/Home/UpdateDonor',
+                contentType: 'application/json',
+                data: JSON.stringify(donorData),
+                success: function (response) {
+                    if (response.success) {
+                        alert('Donor successfully updated!');
+                        window.location.href = '/Home/Index'; // Redirect after successful update
+                    } else {
+                        alert('Failed to update donor: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('An error occurred: ' + error);
+                }
+            });
+        }
+    }
+
+    document.getElementById('updateDonorBtn').addEventListener('click', submitUpdateForm);
+
+    // Logout function
+    function logout() {
+        fetch('/Account/Logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/Account/Login';
+            } else {
+                alert('Logout failed. Please try again.');
+            }
+        }).catch(error => {
+            console.error('Logout error:', error);
+            alert('An error occurred during logout.');
+        });
+    }
+    window.logout = logout;
+</script>
+
+<style>
+    body {
+        background-color: #ff4d4d;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title, .subtitle {
+        text-align: center;
+        color: #ff4d4d;
+    }
+
+    .page-title {
+        font-size: 36px;
+    }
+
+    .subtitle {
+        font-size: 18px;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+        input[readonly] {
+            background-color: #f2f2f2;
+        }
+
+    .btn {
+        width: 100%;
+        padding: 10px;
+        background-color: #ff4d4d;
+        color: white;
+        font-size: 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        .btn:hover {
+            background-color: #e60000;
+        }
+
+    .error-message {
+        font-size: 14px;
+        color: red;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+    }
+
+    /* Style for the logout button */
+    .logout-btn {
+        position: fixed;
+        top: 20px;
+        right: 30px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        color: black;
+        z-index: 1000;
+    }
+
+        .logout-btn i {
+            font-size: 30px;
+        }
+
+        .logout-btn:hover i {
+            color: #333;
+        }
+</style>

@@ -1,0 +1,200 @@
+﻿@model List<string>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+
+<!-- Logout Button in the Top-Right Corner -->
+<button class="logout-btn" onclick="logout()">
+    <i class="fas fa-sign-out-alt" title="Logout"></i>
+</button>
+
+<!-- Home Page Heading -->
+<h1>Welcome to Health Hero</h1>
+
+<!-- Label for the Search Bar -->
+<h4>Choose your Location</h4>
+
+<form id="cityForm">
+    <!-- Dropdown for selecting a city -->
+    <select id="cityDropdown" name="city" class="form-control" onfocus="expandDropdown()"
+            oninput="filterCities(this.value)" onchange="collapseDropdown()" size="1">
+        <option value="" disabled selected>Select a city...</option>
+        @foreach (var city in Model)
+        {
+            <option value="@city">@city</option>
+        }
+    </select>
+
+    <!-- Search Donors Button -->
+    <button class="btn btn-primary" id="searchDonorsButton" type="button" onclick="searchDonors()">Search Donors</button>
+
+    <!-- Add Donor Button -->
+    <button class="btn btn-primary" id="addDonorButton" type="button" onclick="addDonor()">Add Donor</button>
+
+    <!-- Update Donor Button -->
+    <button class="btn btn-primary" id="updateDonorButton" type="button" onclick="updateDonor()">Update Donor</button>
+</form>
+
+<!-- JavaScript for managing dropdown behavior -->
+<script>
+    
+    function expandDropdown() {
+        const dropdown = document.getElementById('cityDropdown');
+        dropdown.size = Math.min(10, dropdown.options.length - 1);  // Expand dropdown to show filtered results
+    }
+
+    function collapseDropdown() {
+        const dropdown = document.getElementById('cityDropdown');
+        dropdown.size = 1;  // Collapse the dropdown after selection
+    }
+
+    function filterCities(value) {
+        const dropdown = document.getElementById('cityDropdown');
+        const options = dropdown.options;
+
+        for (let i = 1; i < options.length; i++) {  // Start from index 1 to skip "Select a city" option
+            const optionText = options[i].textContent || options[i].innerText;
+            if (optionText.toUpperCase().indexOf(value.toUpperCase()) > -1) {
+                options[i].style.display = "";
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+
+        // Expand the dropdown to show filtered results while typing
+        expandDropdown();
+    }
+
+    function searchDonors() {
+        const city = document.getElementById('cityDropdown').value;
+        if (city) {
+            window.location.href = `/Home/SearchDonors?city=${city}`;
+        } else {
+            alert("Please select a city.");
+        }
+    }
+
+    function addDonor() {
+        // Making a fetch call to AddDonor API to check if the user already has a phone number
+        fetch('/Home/AddDonor', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            // If the response redirects to the home page, show the popup
+            if (response.redirected) {
+                window.location.href = response.url; // Go to redirected page
+            } else {
+                window.location.href = '/Home/AddDonor'; // Go to Add Donor if not redirected
+            }
+        }).catch(error => {
+            console.error('Error adding donor:', error);
+            alert('An error occurred while adding the donor.');
+        });
+    }
+
+    function updateDonor() {
+        window.location.href = `/Home/UpdateDonor`;
+    }
+
+    // Logout function
+    function logout() {
+        fetch('/Account/Logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/Account/Login';
+            } else {
+                alert('Logout failed. Please try again.');
+            }
+        }).catch(error => {
+            console.error('Logout error:', error);
+            alert('An error occurred during logout.');
+        });
+    }
+    window.logout = logout;
+</script>
+
+<!-- Red and White Theme Styles -->
+<style>
+    body {
+        background-color: #fff; /* White background */
+        font-family: Arial, sans-serif;
+    }
+
+    h1, h3 {
+        color: #ff4d4d; /* Red color for headings */
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 36px;
+        margin-top: 20px;
+    }
+
+    h3 {
+        font-size: 18px;
+        margin-bottom: 30px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    select.form-control {
+        height: auto;
+    }
+
+    .btn {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #ff4d4d; /* Red button */
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+    }
+
+        .btn:hover {
+            background-color: #e60000; /* Darker red on hover */
+        }
+
+    /* Style for the logout button */
+    .logout-btn {
+        position: fixed;
+        top: 20px;
+        right: 30px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        color: black; /* Black logout button */
+        z-index: 1000; /* Ensure button stays above all other elements */
+    }
+
+        .logout-btn i {
+            font-size: 30px; /* Bigger icon */
+        }
+
+        .logout-btn:hover i {
+            color: #333; /* Hover color change */
+        }
+
+    
+</style>

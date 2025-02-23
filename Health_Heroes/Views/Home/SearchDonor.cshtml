@@ -1,0 +1,139 @@
+﻿@model List<Health_Heroes.Models.Donor_Details>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewData["Title"] = "Donors in @Model.FirstOrDefault()?.City";
+}
+
+<!-- Logout Button in the Top-Right Corner -->
+<button class="logout-btn" onclick="logout()">
+    <i class="fas fa-sign-out-alt" title="Logout"></i>
+</button>
+
+<h1>Donors in @Model.FirstOrDefault()?.City</h1>
+
+@if (Model.Count > 0)
+{
+    <div class="donor-list">
+        @foreach (var donor in Model)
+        {
+            <div class="donor-card">
+                <h2 class="donor-name">@donor.Name</h2>
+                <p><strong>Age:</strong> @donor.Age</p>
+                <p><strong>Blood Type:</strong> @donor.Blood_Type</p>
+                <p><strong>City:</strong> @donor.City</p>
+                <p><strong>Gender:</strong> @donor.Gender</p>
+                <p><strong>Phone Number:</strong> @donor.PhoneNumber</p>
+                <p><strong>Email Address:</strong> @donor.Email_Address</p>
+                <p><strong>Illness:</strong> @donor.Illness</p>
+                <p><strong>Height:</strong> @donor.Height</p>
+                <p><strong>Weight:</strong> @donor.Weight</p>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No donors found for the selected city.</p>
+}
+
+<!-- Ensure jQuery is loaded -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    // Logout function
+    function logout() {
+        fetch('/Account/Logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/Account/Login';
+            } else {
+                alert('Logout failed. Please try again.');
+            }
+        }).catch(error => {
+            console.error('Logout error:', error);
+            alert('An error occurred during logout.');
+        });
+    }
+    window.logout = logout;
+</script>
+
+<!-- CSS for styling the donor cards and layout -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #ffe6e6; /* Light red background */
+        color: #333; /* Dark text color */
+    }
+
+    h1 {
+        color: #ff4d4d;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .donor-list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px; /* Spacing between cards */
+    }
+
+    .donor-card {
+        width: 80%;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        background-color: #f0f8ff; /* Default background color for card */
+        transition: background-color 0.3s ease;
+    }
+
+    .donor-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #ff4d4d;
+        margin-bottom: 10px;
+    }
+
+    .donor-card p {
+        margin: 5px 0;
+    }
+
+    .donor-card:nth-child(2n) {
+        background-color: #ffe6b3; /* Light orange background for even cards */
+    }
+
+    .donor-card:nth-child(3n) {
+        background-color: #d1e7dd; /* Light green background for every 3rd card */
+    }
+
+    .donor-card:nth-child(4n) {
+        background-color: #f8d7da; /* Light pink background for every 4th card */
+    }
+
+    /* Style for the logout button */
+    .logout-btn {
+        position: fixed;
+        top: 20px;
+        right: 30px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        color: black; /* Black logout button */
+        z-index: 1000; /* Ensure button stays above all other elements */
+    }
+
+        .logout-btn i {
+            font-size: 30px; /* Bigger icon */
+        }
+
+        .logout-btn:hover i {
+            color: #333; /* Hover color change */
+        }
+</style>
